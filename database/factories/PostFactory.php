@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\PostStatusEnum;
+use App\Enums\PostStatusEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-use App\PostStatusEnum;
+use App\Enums\PostStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
