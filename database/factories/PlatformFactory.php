@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\PlatformTypeEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,10 @@ class PlatformFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->name(),
+            'type' => fake()->name(),
         ];
     }
+
+    
 }

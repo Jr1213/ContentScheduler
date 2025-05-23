@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Platform;
+use App\Models\Post;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,8 @@ class PostPlatformFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'post_id' => Post::factory()->create()->id,
+            'platform_id' => Platform::factory()->create()->id
         ];
     }
 }
