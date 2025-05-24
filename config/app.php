@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    
+
+    'user_limit' => env('USER_LIMIT', 10),
+
 ];
