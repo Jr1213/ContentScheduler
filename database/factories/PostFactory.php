@@ -24,7 +24,6 @@ class PostFactory extends Factory
             'content' => fake()->sentence(16),
             'image_url' => fake()->imageUrl(),
             'scheduled_time' => now()->addDay()->toDateTimeString(),
-            'status' => array_column(PostStatusEnum::cases(), 'value')[rand(0, count(PostStatusEnum::cases()) - 1)]
         ];
     }
 }

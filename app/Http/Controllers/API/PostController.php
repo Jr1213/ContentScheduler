@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Actions\Post\CreatePostAction;
+use App\Actions\Post\DeletePostAction;
 use App\Actions\Post\UpdatePostAction;
 use App\Dtos\Post\FilterPostDto;
 use App\Enums\PostStatusEnum;
@@ -21,7 +22,8 @@ class PostController extends Controller
     public function __construct(
         private readonly PostService $postService,
         private readonly CreatePostAction $createPostAction,
-        private readonly UpdatePostAction $updatePostAction
+        private readonly UpdatePostAction $updatePostAction,
+        private readonly DeletePostAction $deletePostAction
     ) {}
     public function index(FilterPostRequest $request): JsonResponse
     {
@@ -61,6 +63,17 @@ class PostController extends Controller
             return $this->response(data: [
                 'post' => $post
             ], message: 'post update successfully', status: Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->error($e);
+        }
+    }
+
+    public function destroy(Post $post): JsonResponse
+    {
+        try {
+            request()->user()->can('delete', $post);
+            $this->deletePostAction->handle($post);
+            return $this->response(message: 'Post deleted successfully', status: Response::HTTP_NO_CONTENT);
         } catch (Exception $e) {
             return $this->error($e);
         }

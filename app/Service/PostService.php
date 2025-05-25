@@ -107,4 +107,9 @@ class PostService
             PublishPostJob::dispatch($post);
         }
     }
+
+    public function delete(Post $post): bool
+    {
+        return $post->delete();
+    }
 }

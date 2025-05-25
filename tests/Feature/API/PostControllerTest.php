@@ -204,4 +204,47 @@ class PostControllerTest extends TestCase
 
         Queue::assertPushed(PublishPostJob::class);
     }
+
+    public function test_user_can_only_update_unpublished_post(): void
+    {
+        $post = Post::factory()->create([
+            'user_id' => $this->loginUser->id,
+            'status' => PostStatusEnum::PUBLISHED->value
+        ]);
+
+        $data = [
+            'title' => fake()->sentence(),
+            'content' => fake()->sentence(),
+            'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
+            'platform_id' => [Platform::factory()->create()->id],
+            'image' => UploadedFile::fake()->image('avatar.png')
+        ];
+
+        $response = $this->patchJson(route('post.update', ['post' => $post]), $data, $this->headers);
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+
+        $this->assertDatabaseMissing('posts', [
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'scheduled_time' => $data['scheduled_time'],
+        ]);
+    }
+
+
+    public function test_user_can_delete_post(): void
+    {
+        $post = Post::factory()->create([
+            'user_id' => $this->loginUser->id,
+        ]);
+
+        $response = $this->deleteJson(route('post.destroy', ['post' => $post]), [], $this->headers);
+
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+
+        $this->assertDatabaseMissing('posts', [
+            'id' => $post->id,
+            'deleted_at' => null
+        ]);
+    }
 }
