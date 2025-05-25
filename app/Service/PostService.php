@@ -5,10 +5,11 @@ namespace App\Service;
 use App\Dtos\Post\FilterPostDto;
 use App\Dtos\Post\PostDto;
 use App\Enums\PlatformStatusEnum;
-use App\Models\Platform;
+use App\Jobs\PublishPostJob;
 use App\Models\Post;
-use App\Models\PostPlatform;
 use App\Models\User;
+use DateTime;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class PostService
@@ -50,7 +51,7 @@ class PostService
 
     public function addPostToPlatform(Post $post, array $platform): void
     {
-        $post->platforms()->attach($platform);
+        $post->platforms()->sync($platform);
     }
 
     public function update(PostDto $postDto, Post $post): bool
@@ -82,5 +83,28 @@ class PostService
         }
 
         return $isValid;
+    }
+
+    public function lastAddedJob(): ?int
+    {
+        return DB::table('jobs')
+            ->orderBy('id', 'desc')
+            ->first()?->id;
+    }
+
+    public function deleteJob(int $id)
+    {
+        DB::table('jobs')
+            ->where('id', $id)
+            ->delete();
+    }
+
+    public function dispatchJob(Post $post, DateTime $scheduledTime)
+    {
+        if ($scheduledTime > new DateTime()) {
+            PublishPostJob::dispatch($post)->delay($scheduledTime);
+        } else {
+            PublishPostJob::dispatch($post);
+        }
     }
 }

@@ -21,7 +21,8 @@ class Post extends Model
         'content',
         'image_url',
         'scheduled_time',
-        'status'
+        'status',
+        'job_id',
     ];
 
     protected $casts = [

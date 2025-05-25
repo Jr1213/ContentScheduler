@@ -16,7 +16,6 @@ class PublishPostJob implements ShouldQueue
      */
     public function __construct(public Post $post)
     {
-        //
     }
 
     /**

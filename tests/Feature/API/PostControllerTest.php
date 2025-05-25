@@ -4,11 +4,13 @@ namespace Tests\Feature\API;
 
 use App\Class\Rules\MaxLengthRule;
 use App\Enums\PostStatusEnum;
+use App\Jobs\PublishPostJob;
 use App\Models\Platform;
 use App\Models\Post;
 use App\Models\Rule;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
@@ -76,12 +78,12 @@ class PostControllerTest extends TestCase
         $data = [
             'title' => fake()->sentence(),
             'content' => fake()->sentence(),
-            'status' => PostStatusEnum::PUBLISHED->value,
             'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
             'platform_id' => [$platform->id],
             'image' => UploadedFile::fake()->image('avatar.png')
         ];
 
+        Queue::fake();
         $response = $this->postJson(route('post.store'), $data, $this->headers);
 
         $response->json();
@@ -91,7 +93,6 @@ class PostControllerTest extends TestCase
         $this->assertDatabaseHas('posts', [
             'title' => $data['title'],
             'content' => $data['content'],
-            'status' => $data['status'],
             'scheduled_time' => $data['scheduled_time'],
         ]);
 
@@ -99,6 +100,8 @@ class PostControllerTest extends TestCase
             'platform_id' => $data['platform_id'][0],
             'post_id' => $response['data']['post']['id']
         ]);
+
+        Queue::assertPushed(PublishPostJob::class);
     }
 
 
@@ -109,7 +112,6 @@ class PostControllerTest extends TestCase
         $data = [
             'title' => fake()->sentence(),
             'content' => fake()->sentence(),
-            'status' => PostStatusEnum::PUBLISHED->value,
             'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
             'platform_id' => [Platform::factory()->create()->id],
             'image' => UploadedFile::fake()->image('avatar.png')
@@ -123,7 +125,6 @@ class PostControllerTest extends TestCase
         $this->assertDatabaseMissing('posts', [
             'title' => $data['title'],
             'content' => $data['content'],
-            'status' => $data['status'],
             'scheduled_time' => $data['scheduled_time'],
         ]);
     }
@@ -159,5 +160,48 @@ class PostControllerTest extends TestCase
             'status' => $data['status'],
             'scheduled_time' => $data['scheduled_time'],
         ]);
+    }
+
+    public function test_user_can_update_post(): void
+    {
+        $platform = Platform::factory()->create();
+
+        $post =  Post::factory()->create([
+            'user_id' => $this->loginUser->id
+        ]);
+        $data = [
+            'title' => fake()->sentence(),
+            'content' => fake()->sentence(),
+            'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
+            'platform_id' => [$platform->id],
+            'image' => UploadedFile::fake()->image('avatar.png')
+        ];
+
+        Queue::fake();
+
+        $response = $this->patchJson(route('post.update', ['post' => $post]), $data, $this->headers);
+
+        $response->json();
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas('posts', [
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'scheduled_time' => $data['scheduled_time'],
+        ]);
+
+        $this->assertDatabaseMissing('posts', [
+            'title' => $post['title'],
+            'content' => $post['content'],
+            'scheduled_time' => $post['scheduled_time'],
+        ]);
+
+        $this->assertDatabaseHas('post_platforms', [
+            'platform_id' => $data['platform_id'][0],
+            'post_id' => $response['data']['post']['id']
+        ]);
+
+        Queue::assertPushed(PublishPostJob::class);
     }
 }

@@ -22,4 +22,6 @@ class PostDto
     public readonly ?string $image_url;
 
     public readonly ?PostStatusEnum $status;
+
+    public readonly ?string $job_id;
 }

@@ -17,6 +17,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('profile', [ProfileController::class,'destroy'])->name('profile.destroy');
 
     //posts
-    Route::apiResource('posts',PostController::class)->names('post')->only(['index','store']);
+    Route::apiResource('posts',PostController::class)->names('post')->only(['index','store','update','destroy']);
 
 });
