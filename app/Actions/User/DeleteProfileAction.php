@@ -14,7 +14,7 @@ class DeleteProfileAction
         //
     }
 
-    public function handel(): bool
+    public function handle(): bool
     {
         $user = request()->user();
 

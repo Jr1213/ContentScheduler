@@ -19,7 +19,7 @@ return new class extends Migration
             $table->mediumText('content');
             $table->text('image_url')->nullable();
             $table->dateTime('scheduled_time');
-            $table->enum('status', array_column(PostStatusEnum::cases(), 'value'))->default(PostStatusEnum::DRAFT);
+            $table->enum('status', array_column(PostStatusEnum::cases(), 'value'))->default(PostStatusEnum::SCHEDULED->value);
             $table->timestamps();
             $table->softDeletes();
         });

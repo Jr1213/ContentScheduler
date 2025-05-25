@@ -8,7 +8,7 @@ use App\Service\UserService;
 class CreateUserAction
 {
     public function __construct(private readonly UserService $userService) {}
-    public function handel($data): array
+    public function handle($data): array
     {
         //hash password,
         $data['password'] = $this->userService->hashPassword($data['password']);

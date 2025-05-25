@@ -15,7 +15,7 @@ class UpdateProfileAction
         //
     }
 
-    public function handel($data):array
+    public function handle($data):array
     {
         $user = request()->user();
 

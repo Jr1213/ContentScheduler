@@ -21,7 +21,7 @@ class AuthController extends Controller
 
             $data = $request->validated();
 
-            $response = $this->createUserAction->handel($data);
+            $response = $this->createUserAction->handle($data);
 
             return $this->response(data: $response, message: 'User created successfully', status: Response::HTTP_CREATED);
         } catch (Exception $e) {
@@ -33,7 +33,7 @@ class AuthController extends Controller
     {
         try {
             $data = $request->validated();
-            $response = $this->loginAction->handel(LoginDto::create($data));
+            $response = $this->loginAction->handle(LoginDto::create($data));
             return $this->response(data: $response, message: 'User logged in successfully', status: Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->error($e);

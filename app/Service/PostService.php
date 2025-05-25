@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Dtos\Post\FilterPostDto;
 use App\Dtos\Post\PostDto;
+use App\Enums\PlatformStatusEnum;
 use App\Models\Platform;
 use App\Models\Post;
 use App\Models\PostPlatform;
@@ -47,8 +48,39 @@ class PostService
     }
 
 
-    public function addPostToPlatform(Post $post, int $platform): void
+    public function addPostToPlatform(Post $post, array $platform): void
     {
-        $post->platform()->attach([$platform]);
+        $post->platforms()->attach($platform);
+    }
+
+    public function update(PostDto $postDto, Post $post): bool
+    {
+        return $post->update($postDto->toArray());
+    }
+
+
+    public function updatePlatformStatus(Post $post, int $platform, PlatformStatusEnum $status): bool
+    {
+        return $post->postPlatform()->where('platform_id', $platform)->update([
+            'platform_status' => $status
+        ]);
+    }
+
+    public function validatePost(Post $post): bool
+    {
+
+        $isValid = true;
+        $platforms = $post->platforms;
+        foreach ($platforms as $platform) {
+            $rules = $platform->rules;
+            foreach ($rules as $rule) {
+                if (!$rule->getInstance($post)->validate($post)) {
+                    $isValid = false;
+                    break;
+                }
+            }
+        }
+
+        return $isValid;
     }
 }

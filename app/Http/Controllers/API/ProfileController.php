@@ -38,7 +38,7 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request): JsonResponse
     {
         try {
-            $data = $this->updateProfileAction->handel($request->validated());
+            $data = $this->updateProfileAction->handle($request->validated());
 
             return $this->response(data: $data, message: 'Profile updated successfully');
         } catch (Exception $e) {
@@ -62,7 +62,7 @@ class ProfileController extends Controller
     public function destroy(DeleteProfileRequest $request)
     {
         try {
-            $this->deleteProfileAction->handel();
+            $this->deleteProfileAction->handle();
 
             return $this->response(message: 'Profile deleted successfully', status: Response::HTTP_NO_CONTENT);
         } catch (Exception $e) {

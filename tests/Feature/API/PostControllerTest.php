@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\API;
 
+use App\Class\Rules\MaxLengthRule;
 use App\Enums\PostStatusEnum;
 use App\Models\Platform;
 use App\Models\Post;
+use App\Models\Rule;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,20 +62,30 @@ class PostControllerTest extends TestCase
         $this->assertEquals(now()->subDay()->format('Y-m-d'), Carbon::parse($response['data']['items'][0]['scheduled_time'])->format('Y-m-d'));
     }
 
-    public function test_user_can_store_new_post():void  {
+    public function test_user_can_store_new_post(): void
+    {
+        $platform = Platform::factory()->create();
+
+        $rule = Rule::factory()->create([
+            'path' => MaxLengthRule::class,
+            'key' => 'title',
+            'value' => 260,
+            'platform_id' => $platform->id
+        ]);
+
         $data = [
             'title' => fake()->sentence(),
             'content' => fake()->sentence(),
             'status' => PostStatusEnum::PUBLISHED->value,
             'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
-            'platform_id' => Platform::factory()->create()->id,
-            'image' => UploadedFile::fake()->image('avatar.png')        
+            'platform_id' => [$platform->id],
+            'image' => UploadedFile::fake()->image('avatar.png')
         ];
 
         $response = $this->postJson(route('post.store'), $data, $this->headers);
 
         $response->json();
-        
+
         $response->assertStatus(Response::HTTP_CREATED);
 
         $this->assertDatabaseHas('posts', [
@@ -83,14 +95,14 @@ class PostControllerTest extends TestCase
             'scheduled_time' => $data['scheduled_time'],
         ]);
 
-        $this->assertDatabaseHas('post_platforms',[
-            'platform_id' => $data['platform_id'],
+        $this->assertDatabaseHas('post_platforms', [
+            'platform_id' => $data['platform_id'][0],
             'post_id' => $response['data']['post']['id']
         ]);
     }
 
 
-    public function test_user_can_pass_day_post_limit():void
+    public function test_user_can_pass_day_post_limit(): void
     {
         Post::factory()->count(10)->create(['user_id' => $this->loginUser->id]);
 
@@ -99,14 +111,47 @@ class PostControllerTest extends TestCase
             'content' => fake()->sentence(),
             'status' => PostStatusEnum::PUBLISHED->value,
             'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
-            'platform_id' => Platform::factory()->create()->id,
-            'image' => UploadedFile::fake()->image('avatar.png')        
+            'platform_id' => [Platform::factory()->create()->id],
+            'image' => UploadedFile::fake()->image('avatar.png')
         ];
 
         $response = $this->postJson(route('post.store'), $data, $this->headers);
 
 
         $response->assertStatus(Response::HTTP_FORBIDDEN);
+
+        $this->assertDatabaseMissing('posts', [
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'status' => $data['status'],
+            'scheduled_time' => $data['scheduled_time'],
+        ]);
+    }
+
+    public function test_user_must_send_platform_valid_rules_request(): void
+    {
+        $platform = Platform::factory()->create();
+
+        $rule = Rule::factory()->create([
+            'path' => MaxLengthRule::class,
+            'key' => 'title',
+            'value' => 1,
+            'platform_id' => $platform->id
+        ]);
+
+        $data = [
+            'title' => fake()->sentence(),
+            'content' => fake()->sentence(),
+            'status' => PostStatusEnum::PUBLISHED->value,
+            'scheduled_time' => now()->addDays(1)->format('Y-m-d H:i:s'),
+            'platform_id' => [$platform->id],
+            'image' => UploadedFile::fake()->image('avatar.png')
+        ];
+
+        $response = $this->postJson(route('post.store'), $data, $this->headers);
+
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
 
         $this->assertDatabaseMissing('posts', [
             'title' => $data['title'],

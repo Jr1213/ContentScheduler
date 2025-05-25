@@ -25,10 +25,10 @@ class StorePostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
-            'status' => ['required', 'in:' . implode(',', array_column(PostStatusEnum::cases(), 'value'))],
             'scheduled_time' => ['nullable', 'date', 'after_or_equal:now', 'date_format:Y-m-d H:i:s'],
             'image' => ['nullable', 'image', 'max:2048'],
-            'platform_id' => ['required', 'exists:platforms,id'],
+            'platform_id' => ['required', 'array'],
+            'platform_id.*' => ['required', 'exists:platforms,id'],
         ];
     }
 }

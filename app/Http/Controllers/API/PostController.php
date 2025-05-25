@@ -25,17 +25,18 @@ class PostController extends Controller
             ];
 
             $posts = $this->postService->getUserPosts(FilterPostDto::create($filters), request()->user());
-
+            
             return $this->response(data: $posts, message: 'Posts fetched successfully');
         } catch (Exception $e) {
             return $this->error($e);
         }
     }
 
+
     public function store(StorePostRequest $request): JsonResponse
     {
         try {
-            $post = $this->createPostAction->handel($request);
+            $post = $this->createPostAction->handle($request);
 
             return $this->response(data: [
                 'post' => $post

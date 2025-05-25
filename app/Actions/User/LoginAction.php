@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class LoginAction
 {
     public function __construct(private readonly UserService $userService) {}
-    public function handel(LoginDto $loginDto): array
+    public function handle(LoginDto $loginDto): array
     {
 
         $user = $this->userService->getUserByEmail($loginDto->email);
