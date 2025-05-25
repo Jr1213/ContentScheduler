@@ -20,6 +20,7 @@ use App\Filament\Resources\Model;
 use Dom\Text;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 
@@ -33,10 +34,10 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')->label('Title'),
-                Textarea::make('content')->label('Content'),
-                DateTimePicker::make('scheduled_time')->label('Scheduled Time')->format('Y-m-d H:i:s'),
-
+                TextInput::make('title')->label('Title')->required()->maxLength(255),
+                Textarea::make('content')->label('Content')->required(),
+                FileUpload::make('image_url')->label('Image')->nullable()->image()->maxSize(2048)->directory('posts')->disk('public')->visibility('public'),
+                DateTimePicker::make('scheduled_time')->label('Scheduled Time')->format('Y-m-d H:i:s')->required()->afterOrEqual(now()),
             ])
             ->columns(1);
     }
@@ -53,12 +54,12 @@ class PostResource extends Resource
                 TextColumn::make('title'),
                 TextColumn::make('content'),
                 TextColumn::make('scheduled_time'),
-                ImageColumn::make('image')->circular()->label('Image')->width(200),
+                ImageColumn::make('image_url')->circular()->label('Image'),
                 TextColumn::make('status')
                     ->badge()->color(fn(PostStatusEnum $state): string => match ($state) {
-                        PostStatusEnum::DRAFT => 'gray',
+                        PostStatusEnum::DRAFT => 'danger',
                         PostStatusEnum::PUBLISHED => 'success',
-                        PostStatusEnum::SCHEDULED => 'danger',
+                        PostStatusEnum::SCHEDULED => 'gray',
                     })
 
 
