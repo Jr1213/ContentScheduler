@@ -7,7 +7,7 @@
 
 ```bash
 composer install
-````
+```
 
 ### 2. Install JavaScript Dependencies
 
