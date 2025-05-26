@@ -17,8 +17,6 @@ class UserService
     {
         $data = $userDto->toArray();
 
-        $data['password'] = Hash::make($data['password']);
-
         return User::create($data);
     }
 
