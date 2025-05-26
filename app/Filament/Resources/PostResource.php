@@ -21,8 +21,8 @@ use Dom\Text;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Schmeits\FilamentCharacterCounter\Forms\Components\Textarea;
 
 class PostResource extends Resource
 {
@@ -35,7 +35,7 @@ class PostResource extends Resource
         return $form
             ->schema([
                 TextInput::make('title')->label('Title')->required()->maxLength(255),
-                Textarea::make('content')->label('Content')->required()->length(255),
+                Textarea::make('content')->label('Content')->characterLimit(1000)->required(),
                 FileUpload::make('image_url')->label('Image')->nullable()->image()->maxSize(2048)->directory('posts')->disk('public')->visibility('public'),
                 DateTimePicker::make('scheduled_time')->label('Scheduled Time')->format('Y-m-d H:i:s')->required()->afterOrEqual(now()),
             ])
