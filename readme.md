@@ -7,7 +7,7 @@
 
 ```bash
 composer install
-````
+```
 
 ### 2. Install JavaScript Dependencies
 
@@ -60,6 +60,3 @@ php artisan serve
 ```
 
 Open your browser and go to: [http://localhost:8000](http://localhost:8000)
-
-```
-```
