@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Actions\User\SyncePlatformAction;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Platfomr\SyncPlatformRequest;
+use App\Http\Requests\Platform\SyncPlatformRequest;
 use App\Models\Platform;
 use App\Service\PlatformService;
 use Exception;
