@@ -7,7 +7,7 @@
 
 ```bash
 composer install
-```
+````
 
 ### 2. Install JavaScript Dependencies
 
@@ -53,10 +53,24 @@ In your `.env` file, update:
 APP_URL=http://localhost:8000
 ```
 
-### 8. Run the Application
+### 8. Run Migrations with Seeders
+
+This will set up your database and insert test data:
+
+```bash
+php artisan migrate --seed
+```
+
+> ✅ A test user will be created with the following credentials:
+>
+> * **Email:** `test@example.com`
+> * **Password:** `password`
+
+### 9. Run the Application
 
 ```bash
 php artisan serve
 ```
 
 Open your browser and go to: [http://localhost:8000](http://localhost:8000)
+
